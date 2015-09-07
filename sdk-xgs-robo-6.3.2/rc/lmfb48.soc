@@ -1,0 +1,99 @@
+# $Id: lmfb48.soc 1.5 Broadcom SDK $
+# $Copyright: Copyright 2012 Broadcom Corporation.
+# This program is the proprietary software of Broadcom Corporation
+# and/or its licensors, and may only be used, duplicated, modified
+# or distributed pursuant to the terms and conditions of a separate,
+# written license agreement executed between you and Broadcom
+# (an "Authorized License").  Except as set forth in an Authorized
+# License, Broadcom grants no license (express or implied), right
+# to use, or waiver of any kind with respect to the Software, and
+# Broadcom expressly reserves all rights in and to the Software
+# and all intellectual property rights therein.  IF YOU HAVE
+# NO AUTHORIZED LICENSE, THEN YOU HAVE NO RIGHT TO USE THIS SOFTWARE
+# IN ANY WAY, AND SHOULD IMMEDIATELY NOTIFY BROADCOM AND DISCONTINUE
+# ALL USE OF THE SOFTWARE.  
+#  
+# Except as expressly set forth in the Authorized License,
+#  
+# 1.     This program, including its structure, sequence and organization,
+# constitutes the valuable trade secrets of Broadcom, and you shall use
+# all reasonable efforts to protect the confidentiality thereof,
+# and to use this information only in connection with your use of
+# Broadcom integrated circuit products.
+#  
+# 2.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS
+# PROVIDED "AS IS" AND WITH ALL FAULTS AND BROADCOM MAKES NO PROMISES,
+# REPRESENTATIONS OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY,
+# OR OTHERWISE, WITH RESPECT TO THE SOFTWARE.  BROADCOM SPECIFICALLY
+# DISCLAIMS ANY AND ALL IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY,
+# NONINFRINGEMENT, FITNESS FOR A PARTICULAR PURPOSE, LACK OF VIRUSES,
+# ACCURACY OR COMPLETENESS, QUIET ENJOYMENT, QUIET POSSESSION OR
+# CORRESPONDENCE TO DESCRIPTION. YOU ASSUME THE ENTIRE RISK ARISING
+# OUT OF USE OR PERFORMANCE OF THE SOFTWARE.
+# 
+# 3.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL
+# BROADCOM OR ITS LICENSORS BE LIABLE FOR (i) CONSEQUENTIAL,
+# INCIDENTAL, SPECIAL, INDIRECT, OR EXEMPLARY DAMAGES WHATSOEVER
+# ARISING OUT OF OR IN ANY WAY RELATING TO YOUR USE OF OR INABILITY
+# TO USE THE SOFTWARE EVEN IF BROADCOM HAS BEEN ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGES; OR (ii) ANY AMOUNT IN EXCESS OF
+# THE AMOUNT ACTUALLY PAID FOR THE SOFTWARE ITSELF OR USD 1.00,
+# WHICHEVER IS GREATER. THESE LIMITATIONS SHALL APPLY NOTWITHSTANDING
+# ANY FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.$
+
+# This script runs the tr 19 test for all the 24 GE ports and 4 HiGig
+# ports of the firebolt device. There are 2 firebolt devices on the
+# LM48 platform. 
+# Åfter running the tr 19 test, this script runs the system snake
+# test for the platform.
+
+
+#Set the mode argument as a variable
+if $?1 'local $1 1'
+
+#Set the duration argument as a variable
+if !$?2 'local count 10'
+if $?2 'local count $2'
+
+
+#Check for ext_mode/int_mode argument
+if !$?int_mode && !$?ext_mode || !$?1  'Echo   ; \
+	 Echo -----------------------------------; \
+         Echo MISSING mandatory arguments:; \
+         Echo   ; \
+         Echo lmfb48 ext_mode <duration>; \
+         Echo - run in external mode. Default duration=10 [pkts for tr19, 10sec for ss]; \
+         Echo   ; \
+         Echo lmfb48 int_mode <duration>; \
+         Echo - run in internal mode. Default duration=10 [pkts for tr19, 10sec for ss]; \
+         Echo -----------------------------------; \
+         exit'
+
+
+
+if !$?lm48p && !$?lm48p_D "echo rc: config variable lm48p or lm48p_D not set; exit"
+
+echo " "
+echo "Starting TR 19 test ..."
+testmode run
+
+1:modreg mac_ctrl.hg2 RMTLOOP=1
+1:modreg mac_ctrl.hg3 RMTLOOP=1
+0: tr 19 ExtselfloopPBM=hg count=$count
+1:modreg mac_ctrl.hg2 RMTLOOP=0
+1:modreg mac_ctrl.hg3 RMTLOOP=0
+
+0:modreg mac_ctrl.hg2 RMTLOOP=1
+0:modreg mac_ctrl.hg3 RMTLOOP=1
+1: tr 19 ExtselfloopPBM=hg count=$count
+0:modreg mac_ctrl.hg2 RMTLOOP=0
+0:modreg mac_ctrl.hg3 RMTLOOP=0
+
+echo " "
+echo "Starting System snake test ..."
+
+if $?ext_mode 'Echo (in external mode);0:ss mode=ext duration=$count'
+if $?int_mode 'Echo (in internal mode);0:ss duration=$count'
+
+
+

@@ -1,0 +1,15 @@
+# Filename Make.local.56680
+FEATURE_LIST=PTP CINT  L3 I2C BCMX BCMX_DIAG MEM_SCAN EDITLINE BCM_SAL_PROFILE  CUSTOMER TEST CHASSIS MSTP RCPU
+BCM_PTL_SPT = 1
+
+
+BCM_56680_A0 = 1  
+BCM_56680_B0 = 1
+
+CFGFLAGS += -DBCM_WARM_BOOT_SUPPORT
+CFGFLAGS += -DBCM_WARM_BOOT_SUPPORT_SW_DUMP
+
+# workspace:system=56680  
+# vxworks65:system=56680       buildDir=systems/vxworks/gto        cpu=gto
+# linux26wrs-user:system=56680 buildDir=systems/linux/user/gto-2_6 cpu=gto
+# lverify TARGET=linux-iproc-3_6

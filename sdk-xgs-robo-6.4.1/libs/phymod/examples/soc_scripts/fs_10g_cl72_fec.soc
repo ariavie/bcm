@@ -1,0 +1,96 @@
+#/*----------------------------------------------------------------------
+# * $Id: fs_10g_cl72_fec.soc $
+# *
+# * $Copyright: Copyright 2012 Broadcom Corporation.
+# * This program is the proprietary software of Broadcom Corporation
+# * and/or its licensors, and may only be used, duplicated, modified
+# * or distributed pursuant to the terms and conditions of a separate,
+# * written license agreement executed between you and Broadcom
+# * (an "Authorized License").  Except as set forth in an Authorized
+# * License, Broadcom grants no license (express or implied), right
+# * to use, or waiver of any kind with respect to the Software, and
+# * Broadcom expressly reserves all rights in and to the Software
+# * and all intellectual property rights therein.  IF YOU HAVE
+# * NO AUTHORIZED LICENSE, THEN YOU HAVE NO RIGHT TO USE THIS SOFTWARE
+# * IN ANY WAY, AND SHOULD IMMEDIATELY NOTIFY BROADCOM AND DISCONTINUE
+# * ALL USE OF THE SOFTWARE.  
+# *  
+# * Except as expressly set forth in the Authorized License,
+# *  
+# * 1.     This program, including its structure, sequence and organization,
+# * constitutes the valuable trade secrets of Broadcom, and you shall use
+# * all reasonable efforts to protect the confidentiality thereof,
+# * and to use this information only in connection with your use of
+# * Broadcom integrated circuit products.
+# *  
+# * 2.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS
+# * PROVIDED "AS IS" AND WITH ALL FAULTS AND BROADCOM MAKES NO PROMISES,
+# * REPRESENTATIONS OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY,
+# * OR OTHERWISE, WITH RESPECT TO THE SOFTWARE.  BROADCOM SPECIFICALLY
+# * DISCLAIMS ANY AND ALL IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY,
+# * NONINFRINGEMENT, FITNESS FOR A PARTICULAR PURPOSE, LACK OF VIRUSES,
+# * ACCURACY OR COMPLETENESS, QUIET ENJOYMENT, QUIET POSSESSION OR
+# * CORRESPONDENCE TO DESCRIPTION. YOU ASSUME THE ENTIRE RISK ARISING
+# * OUT OF USE OR PERFORMANCE OF THE SOFTWARE.
+# * 
+# * 3.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL
+# * BROADCOM OR ITS LICENSORS BE LIABLE FOR (i) CONSEQUENTIAL,
+# * INCIDENTAL, SPECIAL, INDIRECT, OR EXEMPLARY DAMAGES WHATSOEVER
+# * ARISING OUT OF OR IN ANY WAY RELATING TO YOUR USE OF OR INABILITY
+# * TO USE THE SOFTWARE EVEN IF BROADCOM HAS BEEN ADVISED OF THE
+# * POSSIBILITY OF SUCH DAMAGES; OR (ii) ANY AMOUNT IN EXCESS OF
+# * THE AMOUNT ACTUALLY PAID FOR THE SOFTWARE ITSELF OR USD 1.00,
+# * WHICHEVER IS GREATER. THESE LIMITATIONS SHALL APPLY NOTWITHSTANDING
+# * ANY FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.$
+# *
+# * Broadcom Corporation
+# * Proprietary and Confidential information
+# * All rights reserved
+# * This source file is the property of Broadcom Corporation, and
+# * may not be copied or distributed in any isomorphic form without the
+# * prior written consent of Broadcom Corporation.
+# *---------------------------------------------------------------------
+# * File       : fs_10g_cl72_fec.soc
+# * Description: fs_10g_cl72_fec
+# *---------------------------------------------------------------------*/
+
+link off
+local port xe4,xe8
+
+
+#To Enable CL72
+phy $port  0x8000096 0x3 
+
+#To Enable FEC. Enable FEC, and set block sync for FEC
+phy $port  0xc134 0x2874 
+phy  $port 0xc113 0x05cb
+
+#Restart Speed Change
+phy $port  0xc050 0x1c
+phy $port  0xc050 0x11c
+
+
+phy $port  0xc051  #0x0003
+#burst err
+#phy $port  0xc143  #0x0009
+
+#read the cl72 status
+phy xe4,xe8 0xc072
+phy xe4,xe8 0x8000096
+phy xe4,xe8 0x8000097
+
+#FEC Error injection
+#phy xe4,xe8  0x9045  0x2
+
+#inject error on lane 0/ports xe4,xe8
+#phy xe4,xe8  0x9032  0x24
+#phy xe4,xe8  0x9032  0x4
+#phy xe4,xe8  0x9032  0x24
+#phy xe4,xe8  0x9032  0x4
+#phy xe4  0x9032  0x24
+#phy xe4  0x9032  0x4
+
+#Read the clear on read,Error Counter
+#phy xe4,xe8  0xc157
+
+

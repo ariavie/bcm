@@ -1,0 +1,150 @@
+/*
+ * $Id$
+ *
+ * $Copyright: Copyright 2012 Broadcom Corporation.
+ * This program is the proprietary software of Broadcom Corporation
+ * and/or its licensors, and may only be used, duplicated, modified
+ * or distributed pursuant to the terms and conditions of a separate,
+ * written license agreement executed between you and Broadcom
+ * (an "Authorized License").  Except as set forth in an Authorized
+ * License, Broadcom grants no license (express or implied), right
+ * to use, or waiver of any kind with respect to the Software, and
+ * Broadcom expressly reserves all rights in and to the Software
+ * and all intellectual property rights therein.  IF YOU HAVE
+ * NO AUTHORIZED LICENSE, THEN YOU HAVE NO RIGHT TO USE THIS SOFTWARE
+ * IN ANY WAY, AND SHOULD IMMEDIATELY NOTIFY BROADCOM AND DISCONTINUE
+ * ALL USE OF THE SOFTWARE.  
+ *  
+ * Except as expressly set forth in the Authorized License,
+ *  
+ * 1.     This program, including its structure, sequence and organization,
+ * constitutes the valuable trade secrets of Broadcom, and you shall use
+ * all reasonable efforts to protect the confidentiality thereof,
+ * and to use this information only in connection with your use of
+ * Broadcom integrated circuit products.
+ *  
+ * 2.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS
+ * PROVIDED "AS IS" AND WITH ALL FAULTS AND BROADCOM MAKES NO PROMISES,
+ * REPRESENTATIONS OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY,
+ * OR OTHERWISE, WITH RESPECT TO THE SOFTWARE.  BROADCOM SPECIFICALLY
+ * DISCLAIMS ANY AND ALL IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY,
+ * NONINFRINGEMENT, FITNESS FOR A PARTICULAR PURPOSE, LACK OF VIRUSES,
+ * ACCURACY OR COMPLETENESS, QUIET ENJOYMENT, QUIET POSSESSION OR
+ * CORRESPONDENCE TO DESCRIPTION. YOU ASSUME THE ENTIRE RISK ARISING
+ * OUT OF USE OR PERFORMANCE OF THE SOFTWARE.
+ * 
+ * 3.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL
+ * BROADCOM OR ITS LICENSORS BE LIABLE FOR (i) CONSEQUENTIAL,
+ * INCIDENTAL, SPECIAL, INDIRECT, OR EXEMPLARY DAMAGES WHATSOEVER
+ * ARISING OUT OF OR IN ANY WAY RELATING TO YOUR USE OF OR INABILITY
+ * TO USE THE SOFTWARE EVEN IF BROADCOM HAS BEEN ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGES; OR (ii) ANY AMOUNT IN EXCESS OF
+ * THE AMOUNT ACTUALLY PAID FOR THE SOFTWARE ITSELF OR USD 1.00,
+ * WHICHEVER IS GREATER. THESE LIMITATIONS SHALL APPLY NOTWITHSTANDING
+ * ANY FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.$
+ */
+------------------------------------------------------------------------------
+             IEEE 802.3 Table 28B-3 Flow Control Resolution
+                 Curt McDowell, Broadcom Corp. 04-14-04
+                         Last Updated: 04-14-04
+------------------------------------------------------------------------------
+
+In their local and remote advertisement registers, IEEE PHYs denote the
+enabling of transmission and reception of pause frames in terms of a
+PAUSE bit and an ASM_DIR bit.
+
+
+                            IEEE 802.3-2000
+                              Table 28B-2
+                             Pause Encoding
+
+                PAUSE   ASM_DIR         TX      RX
+                -----   -----           --      --
+                  0       0             0       0
+                  0       1             1       0
+                  1       0             1       1
+                  1       1             0       1
+
+
+                            IEEE 802.3-2000
+                              Table 28B-3
+                            Pause Resolution
+
+      Local           Remote       Local Resolution   Remote Resolution
+  PAUSE  ASM_DIR   PAUSE ASM_DIR      TX    RX          TX    RX
+  
+    0       0        x      x         0     0           0     0
+    0       1        0      x         0     0           0     0
+    0       1        1      0         0     0           0     0
+    0       1        1      1         1     0           0     1
+    1       0        0      x         0     0           0     0
+    1       x        1      x         1     1           1     1
+    1       1        0      0         0     0           0     0
+    1       1        0      1         0     1           1     0
+
+------------------------------------------------------------------------------
+
+The Local Resolution portion of table, expressed as formulae:
+
+Local Advert
+        LP = PAUSE
+        LA = ASM_DIR
+
+Remote Advert
+        RP = PAUSE
+        RA = ASM_DIR
+
+Local Resolution (MAC programming)
+        TX = Enable transmit of pause frames
+        RX = Enable receive of pause frames
+
+(1) RX = LP RP + LP LA RA = LP (RP + LA RA)
+(2) TX = LP RP + RP LA RA = RP (LP + LA RA)
+
+------------------------------------------------------------------------------
+
+Because the Broadcom PHY drivers return the advertisement information in
+terms of TX and RX enable, already converted from PAUSE/ASM_DIR, the
+formulae need to be converted to operate on TX and RX enable.
+
+Local Advert
+        LT = TX pause
+        LR = RX pause
+
+Remote Advert
+        RT = TX pause
+        RR = RX pause
+
+MAC Result
+        TX = TX pause
+        RX = RX pause
+
+                       Pause Resolution Truth Table
+
+            Local           Remote             Local Resolution
+          LT      LR      RT      RR              TX      RX
+
+          0       0       0       0               0       0
+          0       0       0       1               0       0
+          0       0       1       0               0       0
+          0       0       1       1               0       0
+          0       1       0       0               0       0
+          0       1       0       1               1       1
+          0       1       1       0               0       1
+          0       1       1       1               1       1
+          1       0       0       0               0       0
+          1       0       0       1               1       0
+          1       0       1       0               0       0
+          1       0       1       1               0       0
+          1       1       0       0               0       0
+          1       1       0       1               1       1
+          1       1       1       0               0       0
+          1       1       1       1               1       1
+
+(1) TX = LR RR + RR !RT  LT = RR (LR + !RT  LT)
+(2) RX = LR RR + LR  RT !LT = LR (RR +  RT !LT)
+
+These are the formulae used in bcm/esw/port.c:_bcm_port_update() to
+program the MAC TX/RX enables according to autonegotiation results.
+
+------------------------------------------------------------------------------

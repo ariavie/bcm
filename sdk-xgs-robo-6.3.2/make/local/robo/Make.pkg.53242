@@ -1,0 +1,10 @@
+# Filename Make.local.53242
+FEATURE_LIST=PTP CINT  L3 I2C BCMX BCMX_DIAG MEM_SCAN EDITLINE BCM_SAL_PROFILE  CUSTOMER TEST CHASSIS MSTP RCPU
+
+BCM_PTL_SPT = 1
+BCM_53242_A0 = 1
+
+# workspace:system=53242
+# vxworks66:system=53242  buildDir=systems/vxworks/keystone     cpu=keybe
+# linux26wrs-user:system=53242 buildDir=systems/linux/user/keystone-2_6 cpu=keybe
+# lverify TARGET=linux-iproc-3_6

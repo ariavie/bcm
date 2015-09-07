@@ -1,0 +1,190 @@
+/**************************************************************************************/
+/**************************************************************************************/
+/*  File Name     :  falcon_tsc_field_access.h                                        */
+/*  Created On    :  29/04/2013                                                       */
+/*  Created By    :  Kiran Divakar                                                    */
+/*  Description   :  Serdes IP Register and Field access APIs                         */
+/*  Revision      :  $Id: falcon_tsc_field_access.h 492 2014-05-09 23:03:03Z kirand $ */
+/*                                                                                    */
+/*  Copyright: (c) 2014 Broadcom Corporation All Rights Reserved.                     */
+/*  All Rights Reserved                                                               */
+/*  No portions of this material may be reproduced in any form without                */
+/*  the written permission of:                                                        */
+/*      Broadcom Corporation                                                          */
+/*      5300 California Avenue                                                        */
+/*      Irvine, CA  92617                                                             */
+/*                                                                                    */
+/*  All information contained in this document is Broadcom Corporation                */
+/*  company private proprietary, and trade secret.                                    */
+/*                                                                                    */
+/**************************************************************************************/
+/**************************************************************************************/
+/*
+ * $Copyright: Copyright 2012 Broadcom Corporation.
+ * This program is the proprietary software of Broadcom Corporation
+ * and/or its licensors, and may only be used, duplicated, modified
+ * or distributed pursuant to the terms and conditions of a separate,
+ * written license agreement executed between you and Broadcom
+ * (an "Authorized License").  Except as set forth in an Authorized
+ * License, Broadcom grants no license (express or implied), right
+ * to use, or waiver of any kind with respect to the Software, and
+ * Broadcom expressly reserves all rights in and to the Software
+ * and all intellectual property rights therein.  IF YOU HAVE
+ * NO AUTHORIZED LICENSE, THEN YOU HAVE NO RIGHT TO USE THIS SOFTWARE
+ * IN ANY WAY, AND SHOULD IMMEDIATELY NOTIFY BROADCOM AND DISCONTINUE
+ * ALL USE OF THE SOFTWARE.  
+ *  
+ * Except as expressly set forth in the Authorized License,
+ *  
+ * 1.     This program, including its structure, sequence and organization,
+ * constitutes the valuable trade secrets of Broadcom, and you shall use
+ * all reasonable efforts to protect the confidentiality thereof,
+ * and to use this information only in connection with your use of
+ * Broadcom integrated circuit products.
+ *  
+ * 2.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS
+ * PROVIDED "AS IS" AND WITH ALL FAULTS AND BROADCOM MAKES NO PROMISES,
+ * REPRESENTATIONS OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY,
+ * OR OTHERWISE, WITH RESPECT TO THE SOFTWARE.  BROADCOM SPECIFICALLY
+ * DISCLAIMS ANY AND ALL IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY,
+ * NONINFRINGEMENT, FITNESS FOR A PARTICULAR PURPOSE, LACK OF VIRUSES,
+ * ACCURACY OR COMPLETENESS, QUIET ENJOYMENT, QUIET POSSESSION OR
+ * CORRESPONDENCE TO DESCRIPTION. YOU ASSUME THE ENTIRE RISK ARISING
+ * OUT OF USE OR PERFORMANCE OF THE SOFTWARE.
+ * 
+ * 3.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL
+ * BROADCOM OR ITS LICENSORS BE LIABLE FOR (i) CONSEQUENTIAL,
+ * INCIDENTAL, SPECIAL, INDIRECT, OR EXEMPLARY DAMAGES WHATSOEVER
+ * ARISING OUT OF OR IN ANY WAY RELATING TO YOUR USE OF OR INABILITY
+ * TO USE THE SOFTWARE EVEN IF BROADCOM HAS BEEN ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGES; OR (ii) ANY AMOUNT IN EXCESS OF
+ * THE AMOUNT ACTUALLY PAID FOR THE SOFTWARE ITSELF OR USD 1.00,
+ * WHICHEVER IS GREATER. THESE LIMITATIONS SHALL APPLY NOTWITHSTANDING
+ * ANY FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.$
+ */
+
+/** @file falcon_tsc_field_access.h
+ * Registers and field access
+ */
+
+#ifndef FALCON_TSC_API_FIELD_ACCESS_H
+#define FALCON_TSC_API_FIELD_ACCESS_H
+
+#include "falcon_tsc_common.h"
+#include "falcon_tsc_err_code.h"
+
+/** Read a register field as an unsigned value.
+ * @param pa phymod_access_t struct
+ * @param addr 16-bit register address.
+ * @param shift_left  Number of bits sign_bit should be moved to the left [shift_left  = (15 - msb)]
+ * @param shift_right Number of right shifts to move field to bit0        [shift_right = (15 - msb + shift_right)]
+ * @param *val_p 16-bit unsigned value read from the field
+ * @return Error Code generated by API (returns ERR_CODE_NONE if no errors)
+ */
+err_code_t _falcon_tsc_pmd_rdt_field( const phymod_access_t *pa, uint16_t addr, uint8_t shift_left, uint8_t shift_right, uint16_t *val_p);
+
+
+/** Read a register field as an signed value.
+ * @param pa phymod_access_t struct
+ * @param addr 16-bit register address.
+ * @param shift_left  Number of bits sign_bit should be moved to the left [shift_left  = (15 - msb)]
+ * @param shift_right Number of right shifts to move field to bit0        [shift_right = (15 - msb + lsb)]
+ * @param *val_p 16-bit signed value read from the field
+ * @return Error Code generated by API (returns ERR_CODE_NONE if no errors)
+ */
+err_code_t _falcon_tsc_pmd_rdt_field_signed( const phymod_access_t *pa, uint16_t addr, uint8_t shift_left, uint8_t shift_right, int16_t *val_p);
+
+/*-------------------------------*/
+/* Byte Write and Read Functions */
+/*-------------------------------*/
+
+/** Write a contiguous bit field in a register.
+ * @param pa phymod_access_t struct
+ * @param addr 16-bit register address.
+ * @param mask 16-bit mask indicating the position of the field with bits of 1s
+ * @param lsb  LSB of the field, the width of the field is implied by mask.
+ * @param val  8bit value to write into the field.
+ * @return Error Code generated by API (returns ERR_CODE_NONE if no errors)
+ */
+err_code_t _falcon_tsc_pmd_mwr_reg_byte( const phymod_access_t *pa, uint16_t addr, uint16_t mask, uint8_t lsb, uint8_t val);
+
+
+/** Read a register field as an 8-bit unsigned value.
+ * @param pa phymod_access_t struct
+ * @param addr 16-bit register address.
+ * @param shift_left  Number of bits sign_bit should be moved to the left [shift_left  = (15 - msb)]
+ * @param shift_right Number of right shifts to move field to bit0        [shift_right = (15 - msb + lsb)]
+ * @param *val_p 8-bit unsigned value read from the field
+ * @return Error Code generated by API (returns ERR_CODE_NONE if no errors)
+ */
+err_code_t _falcon_tsc_pmd_rdt_field_byte( const phymod_access_t *pa, uint16_t addr, uint8_t shift_left, uint8_t shift_right, uint8_t *val_p);
+
+
+/** Read a register field as an 8-bit signed value.
+ * @param pa phymod_access_t struct
+ * @param addr 16-bit register address.
+ * @param shift_left  Number of bits sign_bit should be moved to the left [shift_left  = (15 - msb)]
+ * @param shift_right Number of right shifts to move field to bit0        [shift_right = (15 - msb + lsb)]
+ * @param *val_p 8-bit signed value read from the field
+ * @return Error Code generated by API (returns ERR_CODE_NONE if no errors)
+ */
+err_code_t _falcon_tsc_pmd_rdt_field_signed_byte( const phymod_access_t *pa, uint16_t addr, uint8_t shift_left, uint8_t shift_right, int8_t *val_p);
+
+
+/*****************************************************************************
+   The following functions are being retained for legacy purposes and 
+   for Serdes DVT, characterization backwards compatability
+******************************************************************************/
+
+/** Read a register field as an unsigned value.
+ * @param pa phymod_access_t struct
+ * @param addr 16-bit register address.
+ * @param err_code_p error code returned through pointer
+ * @return 16-bit unsigned value read from the field
+ */
+uint16_t _falcon_tsc_pmd_rde_reg( const phymod_access_t *pa, uint16_t addr, err_code_t *err_code_p);
+
+/** Read a register field as an unsigned value.
+ * @param pa phymod_access_t struct
+ * @param addr 16-bit register address.
+ * @param shift_left  Number of bits sign_bit should be moved to the left [shift_left  = (15 - msb)]
+ * @param shift_right Number of right shifts to move field to bit0        [shift_right = (15 - msb + lsb)]
+ * @param err_code_p error code returned through pointer
+ * @return 16-bit unsigned value read from the field
+ */
+uint16_t _falcon_tsc_pmd_rde_field( const phymod_access_t *pa, uint16_t addr, uint8_t shift_left, uint8_t shift_right, err_code_t *err_code_p);
+
+
+/** Read a register field as a signed value.
+ * @param pa phymod_access_t struct
+ * @param addr 16-bit register address.
+ * @param shift_left  Number of bits sign_bit should be moved to the left [shift_left  = (15 - msb)]
+ * @param shift_right Number of right shifts with sign extension          [shift_right = (15 - msb + lsb)]
+ * @param err_code_p error code returned through pointer
+ * @return 16-bit signed value read from the field
+ */
+int16_t  _falcon_tsc_pmd_rde_field_signed( const phymod_access_t *pa, uint16_t addr, uint8_t shift_left, uint8_t shift_right, err_code_t *err_code_p);
+
+
+/** Read a bit field as an unsigned value.
+ * @param pa phymod_access_t struct
+ * @param addr 16-bit register address.
+ * @param shift_left  Number of bits sign_bit should be moved to the left [shift_left  = (15 - msb)]
+ * @param shift_right Number of right shifts to move field to bit0        [shift_right = (15 - msb + lsb)]
+ * @param err_code_p error code returned through pointer
+ * @return 8-bit unsigned value read from the field
+ */
+uint8_t _falcon_tsc_pmd_rde_field_byte( const phymod_access_t *pa, uint16_t addr, uint8_t shift_left, uint8_t shift_right, err_code_t *err_code_p);
+
+
+/** Read a bit field as a signed value.
+ * @param pa phymod_access_t struct
+ * @param addr 16-bit register address.
+ * @param shift_left  Number of bits sign bit should be moved to the left [shift_left  = (15 - msb)]
+ * @param shift_right Number of right shifts with sign extension          [shift_right = (15 - msb + lsb)]
+ * @param err_code_p error code returned through pointer
+ * @return 8-bit signed value read from the field
+ */
+int8_t  _falcon_tsc_pmd_rde_field_signed_byte( const phymod_access_t *pa, uint16_t addr, uint8_t shift_left, uint8_t shift_right, err_code_t *err_code_p);
+
+#endif /* FIELD_ACCESS_H_ */

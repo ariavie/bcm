@@ -1,0 +1,102 @@
+# $Id: Makefile.linux-kmodule-3_6 1.2 Broadcom SDK $
+# $Copyright: Copyright 2012 Broadcom Corporation.
+# This program is the proprietary software of Broadcom Corporation
+# and/or its licensors, and may only be used, duplicated, modified
+# or distributed pursuant to the terms and conditions of a separate,
+# written license agreement executed between you and Broadcom
+# (an "Authorized License").  Except as set forth in an Authorized
+# License, Broadcom grants no license (express or implied), right
+# to use, or waiver of any kind with respect to the Software, and
+# Broadcom expressly reserves all rights in and to the Software
+# and all intellectual property rights therein.  IF YOU HAVE
+# NO AUTHORIZED LICENSE, THEN YOU HAVE NO RIGHT TO USE THIS SOFTWARE
+# IN ANY WAY, AND SHOULD IMMEDIATELY NOTIFY BROADCOM AND DISCONTINUE
+# ALL USE OF THE SOFTWARE.  
+#  
+# Except as expressly set forth in the Authorized License,
+#  
+# 1.     This program, including its structure, sequence and organization,
+# constitutes the valuable trade secrets of Broadcom, and you shall use
+# all reasonable efforts to protect the confidentiality thereof,
+# and to use this information only in connection with your use of
+# Broadcom integrated circuit products.
+#  
+# 2.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS
+# PROVIDED "AS IS" AND WITH ALL FAULTS AND BROADCOM MAKES NO PROMISES,
+# REPRESENTATIONS OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY,
+# OR OTHERWISE, WITH RESPECT TO THE SOFTWARE.  BROADCOM SPECIFICALLY
+# DISCLAIMS ANY AND ALL IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY,
+# NONINFRINGEMENT, FITNESS FOR A PARTICULAR PURPOSE, LACK OF VIRUSES,
+# ACCURACY OR COMPLETENESS, QUIET ENJOYMENT, QUIET POSSESSION OR
+# CORRESPONDENCE TO DESCRIPTION. YOU ASSUME THE ENTIRE RISK ARISING
+# OUT OF USE OR PERFORMANCE OF THE SOFTWARE.
+# 
+# 3.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL
+# BROADCOM OR ITS LICENSORS BE LIABLE FOR (i) CONSEQUENTIAL,
+# INCIDENTAL, SPECIAL, INDIRECT, OR EXEMPLARY DAMAGES WHATSOEVER
+# ARISING OUT OF OR IN ANY WAY RELATING TO YOUR USE OF OR INABILITY
+# TO USE THE SOFTWARE EVEN IF BROADCOM HAS BEEN ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGES; OR (ii) ANY AMOUNT IN EXCESS OF
+# THE AMOUNT ACTUALLY PAID FOR THE SOFTWARE ITSELF OR USD 1.00,
+# WHICHEVER IS GREATER. THESE LIMITATIONS SHALL APPLY NOTWITHSTANDING
+# ANY FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.$
+
+# Due to the extensive use of driver libraries, the SDK usually builds
+# kernel modules from a precompiled object. To avoid various warnings
+# and conflicts, the pre-compiled object must be named differently
+# from the target module, and the object file itself should be
+# appended with "_shipped".
+
+# If a module exports any symbols, then the exporting source file must
+# be compiled within the kernel source tree for correct generation of
+# module symbol versions. The symbol source file should be passed to
+# this Makefile via the MODULE_SYM variable.
+
+MODULE := $(MOD_NAME).o
+KMODULE := $(MOD_NAME).ko
+PRE_COMPILED_OBJ := obj_$(MOD_NAME).o
+
+obj-m := $(MODULE)
+$(MOD_NAME)-y := $(MODULE_SYM) $(PRE_COMPILED_OBJ)
+
+
+ifeq (,$(CROSS_COMPILE))
+
+export CROSS_COMPILE
+
+endif
+
+SAVE_CFLAGS := ${CFLAGS}
+
+include $(SDK)/make/Make.config
+
+PWD := $(shell pwd)
+
+ifneq ($(ARCH),)
+# ELDK does not seem to `automatically' define ARCH where other gccs may
+A := ARCH=$(ARCH)
+export ARCH
+endif
+
+# Standard SDK include path for building source files that export
+# kernel symbols.
+
+override EXTRA_CFLAGS = -I${SDK}/include -I${SDK}/systems/linux/kernel/modules/include -I${SDK}/systems/bde/linux/include
+
+# The precopiled object needs a dummy command file to avoid warnings
+# from the Kbuild scripts (modpost stage).
+# Kernels before 2.6.17 do not support external module symbols files,
+# so we create a dummy to prevent build failures.
+	
+$(KMODULE):
+	rm -f *.o *.ko .*.cmd
+	rm -fr .tmp_versions
+	ln -s $(LIBDIR)/$(MODULE) $(PRE_COMPILED_OBJ)_shipped
+	echo "suppress warning" > .$(PRE_COMPILED_OBJ).cmd
+	$(MAKE) -C $(KERNDIR) CROSS_COMPILE=$(CROSS_COMPILE) M=$(PWD) modules
+	if [ ! -f Module.symvers ]; then echo "old kernel (pre-2.6.17)" > Module.symvers; fi
+	cp -f $(KMODULE) $(LIBDIR)
+	rm -f $(PRE_COMPILED_OBJ)_shipped
+
+EXTRA_CFLAGS = $(CFLAGS)
+CFLAGS := ${SAVE_CFLAGS}

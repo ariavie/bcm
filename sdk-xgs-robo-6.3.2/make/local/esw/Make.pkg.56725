@@ -1,0 +1,13 @@
+# Filename Make.local.56725
+FEATURE_LIST=PTP CINT  L3 I2C BCMX BCMX_DIAG MEM_SCAN EDITLINE BCM_SAL_PROFILE  CUSTOMER TEST CHASSIS MSTP RCPU
+BCM_PTL_SPT = 1
+
+
+BCM_56725_A0 = 1
+# Target: 65 systems/vxworks/gto
+# Target: 00 systems/linux/user/gto-2_6
+
+# workspace:system=56725  
+# vxworks65:system=56725       buildDir=systems/vxworks/gto        cpu=gto
+# linux26wrs-user:system=56725 buildDir=systems/linux/user/gto-2_6 cpu=gto
+# lverify TARGET=linux-iproc-3_6

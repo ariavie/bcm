@@ -1,0 +1,2 @@
+/* $Id: README,v 1.2 2011/07/21 16:14:12 yshtil Exp $ */
+The BCM570x driver has been moved to systems/drv/bcm570x directory.

@@ -1,0 +1,118 @@
+/*
+ * $Id$
+ *
+ * $Copyright: Copyright 2012 Broadcom Corporation.
+ * This program is the proprietary software of Broadcom Corporation
+ * and/or its licensors, and may only be used, duplicated, modified
+ * or distributed pursuant to the terms and conditions of a separate,
+ * written license agreement executed between you and Broadcom
+ * (an "Authorized License").  Except as set forth in an Authorized
+ * License, Broadcom grants no license (express or implied), right
+ * to use, or waiver of any kind with respect to the Software, and
+ * Broadcom expressly reserves all rights in and to the Software
+ * and all intellectual property rights therein.  IF YOU HAVE
+ * NO AUTHORIZED LICENSE, THEN YOU HAVE NO RIGHT TO USE THIS SOFTWARE
+ * IN ANY WAY, AND SHOULD IMMEDIATELY NOTIFY BROADCOM AND DISCONTINUE
+ * ALL USE OF THE SOFTWARE.  
+ *  
+ * Except as expressly set forth in the Authorized License,
+ *  
+ * 1.     This program, including its structure, sequence and organization,
+ * constitutes the valuable trade secrets of Broadcom, and you shall use
+ * all reasonable efforts to protect the confidentiality thereof,
+ * and to use this information only in connection with your use of
+ * Broadcom integrated circuit products.
+ *  
+ * 2.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS
+ * PROVIDED "AS IS" AND WITH ALL FAULTS AND BROADCOM MAKES NO PROMISES,
+ * REPRESENTATIONS OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY,
+ * OR OTHERWISE, WITH RESPECT TO THE SOFTWARE.  BROADCOM SPECIFICALLY
+ * DISCLAIMS ANY AND ALL IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY,
+ * NONINFRINGEMENT, FITNESS FOR A PARTICULAR PURPOSE, LACK OF VIRUSES,
+ * ACCURACY OR COMPLETENESS, QUIET ENJOYMENT, QUIET POSSESSION OR
+ * CORRESPONDENCE TO DESCRIPTION. YOU ASSUME THE ENTIRE RISK ARISING
+ * OUT OF USE OR PERFORMANCE OF THE SOFTWARE.
+ * 
+ * 3.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL
+ * BROADCOM OR ITS LICENSORS BE LIABLE FOR (i) CONSEQUENTIAL,
+ * INCIDENTAL, SPECIAL, INDIRECT, OR EXEMPLARY DAMAGES WHATSOEVER
+ * ARISING OUT OF OR IN ANY WAY RELATING TO YOUR USE OF OR INABILITY
+ * TO USE THE SOFTWARE EVEN IF BROADCOM HAS BEEN ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGES; OR (ii) ANY AMOUNT IN EXCESS OF
+ * THE AMOUNT ACTUALLY PAID FOR THE SOFTWARE ITSELF OR USD 1.00,
+ * WHICHEVER IS GREATER. THESE LIMITATIONS SHALL APPLY NOTWITHSTANDING
+ * ANY FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.$
+ */
+
+
+*******************************************************************
+*                 Events & their arguments                        *
+*******************************************************************
+
+This document comes to describe the events and the meaning of their arguments
+to a callback function registered by the application to be notified when one of
+these events occurs.
+In order to be notified when one of the events described bellow has happened, 
+application should use bcm_esw_switch_event_register API to register a callback
+function together with a userdata. Same call back function with different
+userdata is allowed to be registered. 
+
+
+The events chip could generate
+********************************
+
+BCM_SWITCH_EVENT_IO_ERROR     - Error caused by accesing PCI bus.
+BCM_SWITCH_EVENT_PARITY_ERROR - Parity or ECC error during internal memory access.
+BCM_SWITCH_EVENT_THREAD_ERROR - Critical error after witch thread must end its life. 
+BCM_SWITCH_EVENT_ACCESS_ERROR - Illegal acces to any of internal registers or schan operations.
+BCM_SWITCH_EVENT_ASSERT_ERROR - Any time an assert has happened application should be notified. 
+
+
+Registered callback function will take an event type and 3 arguments as parameters 
+that mostly should be used by the application to log them and report to Broadcom.
+If the registered callback for these types of event been called it is mostly recommended 
+to reset the chip, otherwise none of any expected behavior can not be guaranteed. 
+
+
+Arguments meaning for each type of events
+******************************************
+
+Event - BCM_SWITCH_EVENT_THREAD_ERROR
+---------------------------------------
+arg1  - A thread ID, local enum of thread identifier defined in include\soc\error.h file 
+arg2  - A line number this event was generated from. (__LINE__) 
+arg3  - An error return code of operation that triggered the event. 
+
+
+
+Event - BCM_SWITCH_EVENT_ASSERT_ERROR
+---------------------------------------
+arg1  - A pointer to a file in which the assert took place. (__FILE__)
+arg2  - A line number this event was generated from. (__LINE__) 
+arg3  - 0 if 32 bit build is used and upper 32 bits of a pointer to a file in case of 64 bits build.
+
+
+
+Event - BCM_SWITCH_EVENT_ACCESS_ERROR
+---------------------------------------
+arg1  - SCHAN command, word 0 of schan_op 
+arg2  - Address bit of schan_op. (w1 of schan_op)
+arg3  - Failure code. (error info word) 
+
+
+
+Event - BCM_SWITCH_EVENT_IO_ERROR
+---------------------------------------
+arg1  - Internal identifier DMA or CPU 
+arg2  - PCI address that triggered the error. (0xfff if N/A)
+arg3  - Type of IO error parity or fail  
+
+
+
+Event - BCM_SWITCH_EVENT_PARITY_ERROR
+---------------------------------------
+arg1  - Parity or ECC error identifier (soc_switch_data_error_t).
+arg2  - Memory offset. 
+arg3  - Device-specific unique instance identifier.
+
+

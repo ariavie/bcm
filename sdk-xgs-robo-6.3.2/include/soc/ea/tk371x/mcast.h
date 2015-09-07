@@ -1,0 +1,78 @@
+/*
+ * $Id: mcast.h 1.1 Broadcom SDK $
+ * $Copyright: Copyright 2012 Broadcom Corporation.
+ * This program is the proprietary software of Broadcom Corporation
+ * and/or its licensors, and may only be used, duplicated, modified
+ * or distributed pursuant to the terms and conditions of a separate,
+ * written license agreement executed between you and Broadcom
+ * (an "Authorized License").  Except as set forth in an Authorized
+ * License, Broadcom grants no license (express or implied), right
+ * to use, or waiver of any kind with respect to the Software, and
+ * Broadcom expressly reserves all rights in and to the Software
+ * and all intellectual property rights therein.  IF YOU HAVE
+ * NO AUTHORIZED LICENSE, THEN YOU HAVE NO RIGHT TO USE THIS SOFTWARE
+ * IN ANY WAY, AND SHOULD IMMEDIATELY NOTIFY BROADCOM AND DISCONTINUE
+ * ALL USE OF THE SOFTWARE.  
+ *  
+ * Except as expressly set forth in the Authorized License,
+ *  
+ * 1.     This program, including its structure, sequence and organization,
+ * constitutes the valuable trade secrets of Broadcom, and you shall use
+ * all reasonable efforts to protect the confidentiality thereof,
+ * and to use this information only in connection with your use of
+ * Broadcom integrated circuit products.
+ *  
+ * 2.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS
+ * PROVIDED "AS IS" AND WITH ALL FAULTS AND BROADCOM MAKES NO PROMISES,
+ * REPRESENTATIONS OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY,
+ * OR OTHERWISE, WITH RESPECT TO THE SOFTWARE.  BROADCOM SPECIFICALLY
+ * DISCLAIMS ANY AND ALL IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY,
+ * NONINFRINGEMENT, FITNESS FOR A PARTICULAR PURPOSE, LACK OF VIRUSES,
+ * ACCURACY OR COMPLETENESS, QUIET ENJOYMENT, QUIET POSSESSION OR
+ * CORRESPONDENCE TO DESCRIPTION. YOU ASSUME THE ENTIRE RISK ARISING
+ * OUT OF USE OR PERFORMANCE OF THE SOFTWARE.
+ * 
+ * 3.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL
+ * BROADCOM OR ITS LICENSORS BE LIABLE FOR (i) CONSEQUENTIAL,
+ * INCIDENTAL, SPECIAL, INDIRECT, OR EXEMPLARY DAMAGES WHATSOEVER
+ * ARISING OUT OF OR IN ANY WAY RELATING TO YOUR USE OF OR INABILITY
+ * TO USE THE SOFTWARE EVEN IF BROADCOM HAS BEEN ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGES; OR (ii) ANY AMOUNT IN EXCESS OF
+ * THE AMOUNT ACTUALLY PAID FOR THE SOFTWARE ITSELF OR USD 1.00,
+ * WHICHEVER IS GREATER. THESE LIMITATIONS SHALL APPLY NOTWITHSTANDING
+ * ANY FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.$
+ *
+ * File:     mcast.h
+ * Purpose:
+ *
+ */
+
+#ifndef _SOC_EA_MCAST_H
+#define _SOC_EA_MCAST_H
+
+#include <soc/ea/tk371x/CtcMcastApi.h>
+
+typedef CtcOamMcastVlan _soc_ea_ctc_oam_mcast_vlan_t;
+
+#define _soc_ea_ctc_multicast_vlan_add		CtcExtOamAddMulticastVlan
+#define _soc_ea_ctc_multicast_vlan_del		CtcExtOamDelMulticastVlan
+#define _soc_ea_ctc_multicast_vlan_clear	CtcExtOamClearMulticastVlan
+#define _soc_ea_ctc_multicast_vlan_list		CtcExtOamListMulticastVlan
+#define _soc_ea_ctc_multicast_tag_stripe_set	CtcExtOamSetMulticastTagstripe
+#define _soc_ea_ctc_multicast_taq_stripe_get	CtcExtOamGetMulticastTagstripe
+#define _soc_ea_ctc_multicast_switch_set	CtcExtOamSetMulticastSwitch
+#define _soc_ea_ctc_multicast_switch_get	CtcExtOamGetMulticastSwitch
+#define _soc_ea_ctc_multicast_control_set	CtcExtOamSetMulticastControl
+#define _soc_ea_ctc_multicast_control_list	CtcExtOamListMulticastControl
+#define _soc_ea_ctc_port_multicast_control_list \
+											CtcExtOamListPortMulticastControl
+#define _soc_ea_ctc_multicast_max_group_num_set	\
+											CtcExtOamSetMulticastMaxGroupNum
+#define _soc_ea_ctc_multicast_max_group_num_get \
+											CtcExtOamGetMulticastMaxGroupNum
+#define _soc_ea_ctc_afast_leave_ability_get	CtcExtOamGetaFastLeaveAblity
+#define _soc_ea_ctc_afast_leave_admin_state_do \
+											CtcExtOamaFastLeaveAdminState
+#define _soc_ea_ctc_afast_leave_admin_control CtcExtOamacFastLeaveAdminControl
+
+#endif /* _SOC_EA_MCAST_H */

@@ -1,0 +1,160 @@
+# $Id: gsanity.soc,v 1.79 Broadcom SDK $
+# $Copyright: Copyright 2012 Broadcom Corporation.
+# This program is the proprietary software of Broadcom Corporation
+# and/or its licensors, and may only be used, duplicated, modified
+# or distributed pursuant to the terms and conditions of a separate,
+# written license agreement executed between you and Broadcom
+# (an "Authorized License").  Except as set forth in an Authorized
+# License, Broadcom grants no license (express or implied), right
+# to use, or waiver of any kind with respect to the Software, and
+# Broadcom expressly reserves all rights in and to the Software
+# and all intellectual property rights therein.  IF YOU HAVE
+# NO AUTHORIZED LICENSE, THEN YOU HAVE NO RIGHT TO USE THIS SOFTWARE
+# IN ANY WAY, AND SHOULD IMMEDIATELY NOTIFY BROADCOM AND DISCONTINUE
+# ALL USE OF THE SOFTWARE.  
+#  
+# Except as expressly set forth in the Authorized License,
+#  
+# 1.     This program, including its structure, sequence and organization,
+# constitutes the valuable trade secrets of Broadcom, and you shall use
+# all reasonable efforts to protect the confidentiality thereof,
+# and to use this information only in connection with your use of
+# Broadcom integrated circuit products.
+#  
+# 2.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS
+# PROVIDED "AS IS" AND WITH ALL FAULTS AND BROADCOM MAKES NO PROMISES,
+# REPRESENTATIONS OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY,
+# OR OTHERWISE, WITH RESPECT TO THE SOFTWARE.  BROADCOM SPECIFICALLY
+# DISCLAIMS ANY AND ALL IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY,
+# NONINFRINGEMENT, FITNESS FOR A PARTICULAR PURPOSE, LACK OF VIRUSES,
+# ACCURACY OR COMPLETENESS, QUIET ENJOYMENT, QUIET POSSESSION OR
+# CORRESPONDENCE TO DESCRIPTION. YOU ASSUME THE ENTIRE RISK ARISING
+# OUT OF USE OR PERFORMANCE OF THE SOFTWARE.
+# 
+# 3.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL
+# BROADCOM OR ITS LICENSORS BE LIABLE FOR (i) CONSEQUENTIAL,
+# INCIDENTAL, SPECIAL, INDIRECT, OR EXEMPLARY DAMAGES WHATSOEVER
+# ARISING OUT OF OR IN ANY WAY RELATING TO YOUR USE OF OR INABILITY
+# TO USE THE SOFTWARE EVEN IF BROADCOM HAS BEEN ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGES; OR (ii) ANY AMOUNT IN EXCESS OF
+# THE AMOUNT ACTUALLY PAID FOR THE SOFTWARE ITSELF OR USD 1.00,
+# WHICHEVER IS GREATER. THESE LIMITATIONS SHALL APPLY NOTWITHSTANDING
+# ANY FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.$
+#
+# Script to run the correct variant of the sanity script on the
+# current chip.
+#
+# To run the correct variant on ALL attached chips, run "*:gsanity".
+#
+# Runs:
+#	sanity.soc on StrataSwitch chips
+#	hsanity.soc on Hercules chips
+#	lsanity.soc on Lynx chips
+#	dsanity.soc on Draco chips
+#	tsanity.soc on Tucana/Magnum chips
+#       fsanity.soc on Firebolt2/Firebolt/Helix chips
+#       esanity.soc on Easyrider chips
+#       bsanity.soc on Bradley/HUMV/Goldwing chips
+#       rsanity.soc on Raptor/Raven chips
+#       trsanity.soc on Triumph chips
+#       hksanity.soc on Hawkeye/Hawkeye_EEE chips
+#       ensanity.soc on Enduro chips
+#       vsanity.soc on Valkyrie chips
+#       scsanity.soc on Scorpion/HUMV+/Conqueror chips
+#       tdsanity.soc on Trident/Titan chips
+#       tr3_sanity.soc on Triumph3/Firebolt4 chips
+#       td2sanity.soc on Trident2/Titan2 chips
+#       ghsanity.soc on Greyhound/Rager2 chips
+#       sbxsanity.soc on SBX products
+#       robosanity.soc on ROBO chips
+
+if $?slc || $?gsl || $?sml || $?ul "local script sanity.soc"
+if $?herc || $?herc15	"local script hsanity.soc"
+if $?lynx || $?lynx15	"local script lsanity.soc"
+if $?drac || $?drac15	"local script dsanity.soc"
+if $?tucana || $?magnum "local script tsanity.soc"
+if $?fbpoe || $?firebolt || $?helix || $?felix || $?helix15 || $?felix15 \
+        "local script fsanity.soc"
+if $?easyrider || $?easyrider10 "local script esanity.soc"
+if $?bradley || $?humv || $?goldwing "local script bsanity.soc"
+if $?raptor || $?raven "local script rsanity.soc"
+if $?triumph "local script trsanity.soc"
+if $?hawkeye || $?hawkeye_eee "local script hksanity.soc"
+if $?enduro "local script ensanity.soc"
+if $?hurricane "local script husanity.soc"
+if $?hurricane2 "local script hu2sanity.soc"
+if $?greyhound "local script ghsanity.soc"
+if $?valkyrie "local script vsanity.soc"
+if $?scorpion || $?humvplus || $?conqueror "local script scsanity.soc"
+if $?BCM56520_A0 || $?BCM56520_B0 "local script bcm56520sanity.soc"
+if $?BCM56521_A0 || $?BCM56521_B0 "local script bcm56521sanity.soc"
+if $?BCM56524_A0 || $?BCM56524_B0 || $?BCM56534_B0 "local script bcm56524sanity.soc"
+if $?BCM56526_A0 || $?BCM56526_B0 "local script bcm56526sanity.soc"
+if $?BCM56630_A0 || $?BCM56630_B0 "local script bcm56630sanity.soc"
+if $?BCM56634_A0 || $?BCM56634_B0 "local script bcm56634sanity.soc"
+if $?BCM56636_A0 || $?BCM56636_B0 "local script bcm56636sanity.soc"
+if $?BCM56638_A0 || $?BCM56638_B0 "local script bcm56638sanity.soc"
+if $?BCM56639_A0 || $?BCM56639_B0 "local script bcm56639sanity.soc"
+if $?BCM56538_B0 "local script bcm56538sanity.soc"
+if $?BCM56685_A0 || $?BCM56685_B0 "local script bcm56685sanity.soc"
+if $?BCM56689_A0 || $?BCM56689_B0 "local script bcm56689sanity.soc"
+if $?BCM56324_A0 || $?BCM56324_B0 "local script fsanity.soc"
+if $?trident "local script tdsanity.soc"
+if $?BCM56838_A0 || $?BCM56838_A1 || $?BCM56838_A2 "local script bcm56838sanity.soc"
+if $?BCM56831_A0 || $?BCM56831_A1 || $?BCM56831_A2 "local script bcm56831sanity.soc"
+if $?BCM56835_A0 || $?BCM56835_A1 || $?BCM56835_A2 "local script bcm56835sanity.soc"
+if $?katana "local script ktsanity.soc"
+if $?katana2 "local script kt2sanity.soc" "setenv run_full_sanity 1"
+if $?triumph3 "local script tr3_sanity.soc"
+if $?BCM56640_A0 || $?BCM56640_A1 || $?BCM56640_B0 \
+    "local script bcm56640sanity.soc"
+if $?BCM56643_A0 || $?BCM56643_A1 || $?BCM56643_B0 \
+    "local script bcm56643sanity.soc"
+if $?BCM56644_A0 || $?BCM56644_A1 || $?BCM56644_B0 \
+    "local script bcm56644sanity.soc"
+if $?BCM56648_A0 || $?BCM56648_A1 || $?BCM56648_B0 \
+    "local script bcm56643sanity.soc"
+if $?BCM56649_A0 || $?BCM56649_A1 || $?BCM56649_B0 \
+    "local script bcm56649sanity.soc"
+if $?BCM56540_A0 || $?BCM56540_A1 || $?BCM56540_B0 \
+    "local script bcm56540sanity.soc"
+if $?BCM56541_A0 || $?BCM56541_A1 || $?BCM56541_B0 \
+    "local script bcm56541sanity.soc"
+if $?BCM56542_A0 || $?BCM56542_A1 || $?BCM56542_B0 \
+    "local script bcm56542sanity.soc"
+if $?BCM56545_A0 || $?BCM56545_A1 || $?BCM56545_B0 \
+    "local script bcm56540sanity.soc"
+if $?BCM56544_A0 || $?BCM56544_A1 || $?BCM56544_B0 \
+    "local script bcm56544sanity.soc"
+if $?BCM56546_A0 || $?BCM56546_A1 || $?BCM56546_B0 \
+    "local script bcm56541sanity.soc"
+if $?BCM56046_B0 || $?BCM56045_B0 \
+    "local script bcm56045sanity.soc"
+if $?BCM56340_A0 || $?BCM56342_A0 \
+    "local script bcm56340sanity.soc"
+if $?BCM56344_A0 \
+    "local script bcm56344sanity.soc"
+if $?BCM56040_A0 || $?BCM56041_A0 || $?BCM56042_A0 \
+    "local script bcm56040sanity.soc"
+if $?BCM56547_A0 ||  $?BCM56548_A0 \
+    "local script bcm56547sanity.soc"
+if $?BCM56049_A0 "local script bcm56049sanity.soc"    
+if $?shadow "local script shadowsanity.soc"
+if $?trident2 "local script td2sanity.soc"
+if $?BCM56834_A0 || $?BCM56834_A1 || $?BCM56834_A2 "local script bcm56834sanity.soc"
+if $?voyager "local script vosanity.soc"
+if $?testarossa || $?dino16 || $?dino8 || $?mondial || $?silveroak || $?falcon || $?harrier || $?vulcan\
+ || $?blackbird || $?thunderbolt || $?lotus || $?starfighter\
+ || $?blackbird2 || $?northstar || $?polar || $?northstarplus\
+ "local script robosanity.soc"
+
+if $?sbx "local script sbxsanity.soc"
+
+if $?PETRAB_A0 "local script bcm88640sanity.soc"
+if $?ARAD_A0 || $?ARAD_B0 "local script bcm88650sanity.soc"
+if $?BCM88750_A0 || $?BCM88750_B0 "local script bcm88750sanity.soc"
+
+if !$?script \
+	"echo 'ERROR: Unit $unit ($devname): cannot determine sanity script'"
+if $?script \
+	"echo 'Unit $unit ($devname) running $script'; rccache add $script; rcload $script; rccache delete $script"

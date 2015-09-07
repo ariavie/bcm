@@ -1,0 +1,99 @@
+# $Id: Makefile.unix-linux,v 1.11 Broadcom SDK $
+# $Copyright: Copyright 2012 Broadcom Corporation.
+# This program is the proprietary software of Broadcom Corporation
+# and/or its licensors, and may only be used, duplicated, modified
+# or distributed pursuant to the terms and conditions of a separate,
+# written license agreement executed between you and Broadcom
+# (an "Authorized License").  Except as set forth in an Authorized
+# License, Broadcom grants no license (express or implied), right
+# to use, or waiver of any kind with respect to the Software, and
+# Broadcom expressly reserves all rights in and to the Software
+# and all intellectual property rights therein.  IF YOU HAVE
+# NO AUTHORIZED LICENSE, THEN YOU HAVE NO RIGHT TO USE THIS SOFTWARE
+# IN ANY WAY, AND SHOULD IMMEDIATELY NOTIFY BROADCOM AND DISCONTINUE
+# ALL USE OF THE SOFTWARE.  
+#  
+# Except as expressly set forth in the Authorized License,
+#  
+# 1.     This program, including its structure, sequence and organization,
+# constitutes the valuable trade secrets of Broadcom, and you shall use
+# all reasonable efforts to protect the confidentiality thereof,
+# and to use this information only in connection with your use of
+# Broadcom integrated circuit products.
+#  
+# 2.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS
+# PROVIDED "AS IS" AND WITH ALL FAULTS AND BROADCOM MAKES NO PROMISES,
+# REPRESENTATIONS OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY,
+# OR OTHERWISE, WITH RESPECT TO THE SOFTWARE.  BROADCOM SPECIFICALLY
+# DISCLAIMS ANY AND ALL IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY,
+# NONINFRINGEMENT, FITNESS FOR A PARTICULAR PURPOSE, LACK OF VIRUSES,
+# ACCURACY OR COMPLETENESS, QUIET ENJOYMENT, QUIET POSSESSION OR
+# CORRESPONDENCE TO DESCRIPTION. YOU ASSUME THE ENTIRE RISK ARISING
+# OUT OF USE OR PERFORMANCE OF THE SOFTWARE.
+# 
+# 3.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL
+# BROADCOM OR ITS LICENSORS BE LIABLE FOR (i) CONSEQUENTIAL,
+# INCIDENTAL, SPECIAL, INDIRECT, OR EXEMPLARY DAMAGES WHATSOEVER
+# ARISING OUT OF OR IN ANY WAY RELATING TO YOUR USE OF OR INABILITY
+# TO USE THE SOFTWARE EVEN IF BROADCOM HAS BEEN ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGES; OR (ii) ANY AMOUNT IN EXCESS OF
+# THE AMOUNT ACTUALLY PAID FOR THE SOFTWARE ITSELF OR USD 1.00,
+# WHICHEVER IS GREATER. THESE LIMITATIONS SHALL APPLY NOTWITHSTANDING
+# ANY FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.$
+#
+# Build rules for Linux/x86 (Little Endian) with PLI support
+
+include ${SDK}/make/Makefile.unix-common
+
+# When using GDB on Linux, you may want to use "setenv GDB 1" to disable
+# editline.  For best results put "set environment GDB 1" in your .gdbinit.
+
+# Linux-specific Configuration Flags
+
+ENDIAN_DEF = -DLE_HOST=1
+
+# Notes on AMD Athlon 64-bit
+#
+# Compiles on x86_64 default to 32-bit emulation unless 64-bit mode
+# is specifically requested in Make.local by uncommenting the two defines
+# for PTRS_ARE_64BITS and LONGS_ARE_64BITS.
+#
+# Note that the code base will compile in 64-bit mode, but will not run
+# correctly because malloc() can return values >32 bits and the PLISIM
+# protocol only supports 32-bit addresses.
+
+ifeq ($(shell uname -m),x86_64)
+ ifeq (,$(findstring -DPTRS_ARE_64BITS,$(CFGFLAGS)))
+  CC = ${HCC} -m32
+  CXX = g++ -m32
+ else
+  CC = ${HCC}
+  CXX = g++
+ endif
+endif
+
+LD	= ld
+AR	= ar
+ARFLAGS	= -rc
+STRIP	= strip
+RANLIB  = ranlib
+
+# Filter out features that cannot or should not be supported in Linux
+ifdef ESW_CHIPS
+_FEATURE_EXCLUDE_LIST += OOB_RCPU
+endif
+FEATURE_EXCLUDE_LIST = $(sort $(_FEATURE_EXCLUDE_LIST))
+
+
+# Linux
+LIBS= -lnsl -lpthread -lm -lrt
+CFGFLAGS += -DBCM_PLATFORM_STRING=\"unix-linux\"
+
+# For GCC 4.2.x, add -Wno-address
+GCC_MAJOR_VER  = $(shell echo |$(CC) -dM -E -| grep __GNUC__ | cut -d' ' -f3)
+GCC_MINOR_VER  = $(shell echo |$(CC) -dM -E -| grep __GNUC_MINOR__ | cut -d' ' -f3)
+ifeq (${GCC_MAJOR_VER}, 4)
+ifeq (${GCC_MINOR_VER}, 2)
+BCM_EXTRA_CC_CFLAGS   = -Wno-address
+endif
+endif

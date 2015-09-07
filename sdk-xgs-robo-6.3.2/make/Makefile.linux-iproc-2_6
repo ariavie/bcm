@@ -1,0 +1,105 @@
+# $Id: Makefile.linux-iproc-2_6 1.10 Broadcom SDK $
+# $Copyright: Copyright 2012 Broadcom Corporation.
+# This program is the proprietary software of Broadcom Corporation
+# and/or its licensors, and may only be used, duplicated, modified
+# or distributed pursuant to the terms and conditions of a separate,
+# written license agreement executed between you and Broadcom
+# (an "Authorized License").  Except as set forth in an Authorized
+# License, Broadcom grants no license (express or implied), right
+# to use, or waiver of any kind with respect to the Software, and
+# Broadcom expressly reserves all rights in and to the Software
+# and all intellectual property rights therein.  IF YOU HAVE
+# NO AUTHORIZED LICENSE, THEN YOU HAVE NO RIGHT TO USE THIS SOFTWARE
+# IN ANY WAY, AND SHOULD IMMEDIATELY NOTIFY BROADCOM AND DISCONTINUE
+# ALL USE OF THE SOFTWARE.  
+#  
+# Except as expressly set forth in the Authorized License,
+#  
+# 1.     This program, including its structure, sequence and organization,
+# constitutes the valuable trade secrets of Broadcom, and you shall use
+# all reasonable efforts to protect the confidentiality thereof,
+# and to use this information only in connection with your use of
+# Broadcom integrated circuit products.
+#  
+# 2.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS
+# PROVIDED "AS IS" AND WITH ALL FAULTS AND BROADCOM MAKES NO PROMISES,
+# REPRESENTATIONS OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY,
+# OR OTHERWISE, WITH RESPECT TO THE SOFTWARE.  BROADCOM SPECIFICALLY
+# DISCLAIMS ANY AND ALL IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY,
+# NONINFRINGEMENT, FITNESS FOR A PARTICULAR PURPOSE, LACK OF VIRUSES,
+# ACCURACY OR COMPLETENESS, QUIET ENJOYMENT, QUIET POSSESSION OR
+# CORRESPONDENCE TO DESCRIPTION. YOU ASSUME THE ENTIRE RISK ARISING
+# OUT OF USE OR PERFORMANCE OF THE SOFTWARE.
+# 
+# 3.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL
+# BROADCOM OR ITS LICENSORS BE LIABLE FOR (i) CONSEQUENTIAL,
+# INCIDENTAL, SPECIAL, INDIRECT, OR EXEMPLARY DAMAGES WHATSOEVER
+# ARISING OUT OF OR IN ANY WAY RELATING TO YOUR USE OF OR INABILITY
+# TO USE THE SOFTWARE EVEN IF BROADCOM HAS BEEN ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGES; OR (ii) ANY AMOUNT IN EXCESS OF
+# THE AMOUNT ACTUALLY PAID FOR THE SOFTWARE ITSELF OR USD 1.00,
+# WHICHEVER IS GREATER. THESE LIMITATIONS SHALL APPLY NOTWITHSTANDING
+# ANY FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.$
+# Makefile for iproc-CMICd
+
+# User must select one platform from below.By default ARM_LINUX is selected. .
+ifeq (,$(BUILD_PLATFORM))
+BUILD_PLATFORM=ARM_LINUX
+endif
+
+# Toolchain base directory for iPROC-CMICd devices
+TOOLCHAIN_BASE_DIR:= /projects/ntsw-tools/linux/iproc_ldks/ldk26/iproc
+
+# Compiler for target architecture
+TARGET_ARCHITECTURE:= arm-unknown-linux-uclibcgnueabi
+
+# Kernel directory for iPROC-CMICd devices
+KERNDIR:= $(TOOLCHAIN_BASE_DIR)/kernel/linux-custom
+
+ifeq (,$(CROSS_COMPILE))
+CROSS_COMPILE:= $(TARGET_ARCHITECTURE)-
+endif
+
+# arm9tools
+TOOLCHAIN_BIN_DIR=$(TOOLCHAIN_BASE_DIR)/buildroot/usr/bin
+override PATH:=$(TOOLCHAIN_BASE_DIR)/buildroot/usr/$(TARGET_ARCHITECTURE)/bin:$(TOOLCHAIN_BIN_DIR):$(PATH)
+LD_LIBRARY_PATH=$(TOOLCHAIN_BASE_DIR)/buildroot/usr/lib
+
+export TOOLCHAIN_BIN_DIR LD_LIBRARY_PATH
+
+# Default Linux include directory
+ifeq (,$(LINUX_INCLUDE))
+LINUX_INCLUDE := $(KERNDIR)/include
+endif
+
+CFGFLAGS += -DSYS_BE_PIO=0 -DSYS_BE_PACKET=0 -DSYS_BE_OTHER=0
+ENDIAN = LE_HOST=1
+CFGFLAGS += -D$(ENDIAN) -DIPROC_CMICD
+CFGFLAGS += -DBCM_PLATFORM_STRING=\"IPROC_CMICD\"
+
+ARCH = arm
+KBUILD_VERBOSE = 1
+
+export ARCH KBUILD_VERBOSE
+
+comma = ,
+basetarget = $(basename $(notdir $@))
+modname = $(basetarget)
+
+# Extra variables.
+EXTRA_CFLAGS = -D"KBUILD_STR(s)=\#s" $(basename_flags) $(modname_flags)
+
+name-fix = $(subst $(comma),_,$(subst -,_,$1))
+basename_flags = -D"KBUILD_BASENAME=KBUILD_STR($(call name-fix,$(basetarget)))"
+modname_flags  = $(if $(filter 1,$(words $(modname))),\
+                 -D"KBUILD_MODNAME=KBUILD_STR($(call name-fix,$(modname)))")
+
+KFLAG_INCLD = $(TOOLCHAIN_BASE_DIR)/buildroot/usr/lib/gcc/$(TARGET_ARCHITECTURE)/4.7.1/include
+
+ifeq (,$(KFLAGS))
+KFLAGS := -D__LINUX_ARM_ARCH__=7 -D__KERNEL__ -nostdinc  -isystem $(KFLAG_INCLD) -I$(LINUX_INCLUDE) -include $(LINUX_INCLUDE)/linux/version.h -include $(LINUX_INCLUDE)/generated/autoconf.h -I$(KERNDIR)/arch/arm/include -I$(KERNDIR)/arch/arm/mach-northstar/include -I$(KERNDIR)/arch/arm/plat-iproc/include -Wall -Wstrict-prototypes -Wno-trigraphs -Os -fno-strict-aliasing -fno-common -marm -mabi=aapcs-linux -fno-pic -pipe -msoft-float -ffreestanding -march=armv7-a -mfpu=vfp -mfloat-abi=softfp -fomit-frame-pointer -g -fno-stack-protector -Wdeclaration-after-statement -Wno-pointer-sign -mlong-calls
+endif
+
+ifneq ($(targetplat),user)
+include ${SDK}/make/Makefile.linux-kernel-2_6
+endif

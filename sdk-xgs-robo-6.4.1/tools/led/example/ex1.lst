@@ -1,0 +1,120 @@
+00:         ; $Id: ex1.asm 1.3 Broadcom SDK $
+00:         ;
+00:         ; $Copyright: Copyright 2012 Broadcom Corporation.
+00:         ; This program is the proprietary software of Broadcom Corporation
+00:         ; and/or its licensors, and may only be used, duplicated, modified
+00:         ; or distributed pursuant to the terms and conditions of a separate,
+00:         ; written license agreement executed between you and Broadcom
+00:         ; (an "Authorized License").  Except as set forth in an Authorized
+00:         ; License, Broadcom grants no license (express or implied), right
+00:         ; to use, or waiver of any kind with respect to the Software, and
+00:         ; Broadcom expressly reserves all rights in and to the Software
+00:         ; and all intellectual property rights therein.  IF YOU HAVE
+00:         ; NO AUTHORIZED LICENSE, THEN YOU HAVE NO RIGHT TO USE THIS SOFTWARE
+00:         ; IN ANY WAY, AND SHOULD IMMEDIATELY NOTIFY BROADCOM AND DISCONTINUE
+00:         ; ALL USE OF THE SOFTWARE.  
+00:         ;  
+00:         ; Except as expressly set forth in the Authorized License,
+00:         ;  
+00:         ; 1.     This program, including its structure, sequence and organization,
+00:         ; constitutes the valuable trade secrets of Broadcom, and you shall use
+00:         ; all reasonable efforts to protect the confidentiality thereof,
+00:         ; and to use this information only in connection with your use of
+00:         ; Broadcom integrated circuit products.
+00:         ;  
+00:         ; 2.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS
+00:         ; PROVIDED "AS IS" AND WITH ALL FAULTS AND BROADCOM MAKES NO PROMISES,
+00:         ; REPRESENTATIONS OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY,
+00:         ; OR OTHERWISE, WITH RESPECT TO THE SOFTWARE.  BROADCOM SPECIFICALLY
+00:         ; DISCLAIMS ANY AND ALL IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY,
+00:         ; NONINFRINGEMENT, FITNESS FOR A PARTICULAR PURPOSE, LACK OF VIRUSES,
+00:         ; ACCURACY OR COMPLETENESS, QUIET ENJOYMENT, QUIET POSSESSION OR
+00:         ; CORRESPONDENCE TO DESCRIPTION. YOU ASSUME THE ENTIRE RISK ARISING
+00:         ; OUT OF USE OR PERFORMANCE OF THE SOFTWARE.
+00:         ; 
+00:         ; 3.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL
+00:         ; BROADCOM OR ITS LICENSORS BE LIABLE FOR (i) CONSEQUENTIAL,
+00:         ; INCIDENTAL, SPECIAL, INDIRECT, OR EXEMPLARY DAMAGES WHATSOEVER
+00:         ; ARISING OUT OF OR IN ANY WAY RELATING TO YOUR USE OF OR INABILITY
+00:         ; TO USE THE SOFTWARE EVEN IF BROADCOM HAS BEEN ADVISED OF THE
+00:         ; POSSIBILITY OF SUCH DAMAGES; OR (ii) ANY AMOUNT IN EXCESS OF
+00:         ; THE AMOUNT ACTUALLY PAID FOR THE SOFTWARE ITSELF OR USD 1.00,
+00:         ; WHICHEVER IS GREATER. THESE LIMITATIONS SHALL APPLY NOTWITHSTANDING
+00:         ; ANY FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.$
+00:         ; 
+00:         ;
+00:         ;Here is an example program for programming the LEDs on the 5605.
+00:         ;This is about as simple as it gets.
+00:         ;
+00:         ;The situation is this:
+00:         ;
+00:         ;    26 ports (port 0-25) each have one LED.
+00:         ;
+00:         ;    The LED is dark if there has been no activity,
+00:         ;    or is on if there has been either RX, TX, or Collision.
+00:         ;
+00:         ;    We shift out port 0 status first, port 25 last.
+00:         ;
+00:         ;
+00:         ;-------------------------- start of program --------------------------
+00:         
+00:         begin:
+00: 02 00   	ld	A,0		; start with port 0
+02: 60 7F   	ld	(portnum),A
+04:         
+04:         portloop:
+04: 28      	port	A		; specify which port we're dealing with
+05: 32 00   	pushst	RX
+07: 32 01   	pushst	TX
+09: B7      	tor			; RX | TX
+0A: 32 02   	pushst	COLL
+0C: B7      	tor			; RX | TX | COLL
+0D: 87      	pack			; send to output buffer
+0E:         
+0E: 86 7F   	inc	(portnum)
+10: 06 7F   	ld	A,(portnum)
+12: D2 1A   	cmp	A,26
+14: 74 04   	jnz	portloop
+16:         
+16: 3A 1A   	send	26		; send 26 LED pulses and halt
+18:         	
+18:         
+18:         ; data storage
+18:         portnum		equ	0x7F	; temp to hold which port we're working on
+18:         
+18:         
+18:         ; symbolic labels
+18:         ; this gives symbolic names to the various bits of the port status fields
+18:         
+18:         RX		equ	0x0	; received packet
+18:         TX		equ	0x1	; transmitted packet
+18:         COLL		equ	0x2	; collision indicator
+18:         SPEED_C		equ	0x3	;  100 Mbps
+18:         SPEED_M		equ	0x4	; 1000 Mbps
+18:         DUPLEX		equ	0x5	; half/full duplex
+18:         FLOW		equ	0x6	; flow control capable
+18:         LINKUP		equ	0x7	; link down/up status
+18:         LINKEN		equ	0x8	; link disabled/enabled status
+18:         
+18:         ;-------------------------- end of program --------------------------
+18:         ;
+18:         ;This program is 23 bytes in length and uses one data storage location.
+18:         ;This wasn't necessary, as the B register could have been used, but
+18:         ;the point was to show some of the instructions.
+18:         
+
+
+
+----- symbol table, 12 symbols -----
+       begin	0x0000
+    portloop	0x0004
+     portnum	0x007F
+          rx	0x0000
+          tx	0x0001
+        coll	0x0002
+     speed_c	0x0003
+     speed_m	0x0004
+      duplex	0x0005
+        flow	0x0006
+      linkup	0x0007
+      linken	0x0008
